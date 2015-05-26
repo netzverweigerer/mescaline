@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 import re
-import argparse
+import getpass
 
 encoding = sys.getdefaultencoding()
 
@@ -285,7 +285,7 @@ def get_valid_cwd():
     return cwd
 
 def get_username():
-    return "armin"
+    return getpass.getuser()
 
 if __name__ == '__main__':
     p = Mescaline()
