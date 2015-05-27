@@ -14,22 +14,33 @@ cd "$home"
 
 # print a message
 msg () {
-  msg="$@"
-	printf "[mescaline] %s \n" "${msg}"
+	printf "[mescaline] "
+  printf "$@ \n"
 }
 
-# check for conflicting ".mescaline" in your home directory, and if all is
-# cool, copy over mescaline files to ~/.mescaline
-if [ -e $HOME/.mescaline ]; then
-	msg "mescaline already exists in your home directory:"
-	ls -ald "$HOME/.mescaline"
-	msg "I'm not going to overwrite it, so you have to resolve this \
-		situation on your own."
-	exit 1
-else
-  mkdir -p $HOME/.mescaline
-	cp -R ./ $HOME/.mescaline; cd; ln -s .mescaline/zshrc .zshrc
-fi
+# file/directory exists error message
+fileexists () {
+  file="$@"
+  if [ -e "$file" ]; then
+    msg "File or directory exists: "
+    msg "${file}"
+    msg "I'm not going to overwrite it, so you have to resolve this."
+    msg "Exiting gracefully. Goodbye."
+    exit 1
+  fi
+}
+
+# check for conflicts
+fileexists "$HOME/.mescaline"
+fileexists "$HOME/.zshrc"
+
+mkdir -p "$HOME/.mescaline"
+cp -R ./ "$HOME/.mescaline"
+cd
+ln -s .mescaline/zshrc .zshrc
+
+msg "setup complete."
+
 
 
 
