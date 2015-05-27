@@ -11,17 +11,19 @@ script="${0%/*}"
 home="$(readlink -f $script)"
 cd "$home"
 
-# print an error message and exit with an error code != 0
-error () {
+# print a message
+msg () {
   msg="$@"
-	printf "Critical error: %s" "${msg}"
-	exit 1
+	printf "[mescaline] %s \n" "${msg}"
 }
 
 # check for conflicting ".mescaline" in your home directory, and if all is
 # cool, copy over mescaline files to ~/.mescaline
-if [[ -e $HOME/.mescaline ]]; then
-	error "mescaline exists in your home directory, exiting."
+if [ -e $HOME/.mescaline ]; then
+	msg "mescaline already exists in your home directory:"
+	ls -ald "$HOME/.mescaline"
+	msg "I'm not going to overwrite it, so you have to resolve this \
+		situation on your own."
 	exit 1
 else
   mkdir -p $HOME/.mescaline
