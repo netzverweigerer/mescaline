@@ -1,36 +1,36 @@
-# mescaline for zsh - based on powerline
+# mescaline for zsh - based on powerline / ezzsh, but this version is
+# entirely re-written from scratch.
+# Written by Arminius <armin@arminius.org>
+#
+# Released under the terms of the GNU General Public License,
+# Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
-zsh="$HOME/.mescaline/"
+# set mescaline installation location
+mescaline_home="$HOME/.mescaline/"
 
 function _mescaline () {
   export PROMPT="$(~/.mescaline/mescaline $?)"
 }
-
 precmd () {
 	_mescaline
 }
 
-
-# workaround for xfce4-terminal to force $TERM:
-if [[ "$COLORTERM" == "xfce4-terminal" ]]; then
-    export TERM="xterm-256color"
-fi
-
-# workaround for rxvt-unicode
+# force $TERM on rxvt
 if [[ "$COLORTERM" == "rxvt-xpm" ]]; then
     export TERM="rxvt-unicode-256color"
 fi
 
-# set $OS_TYPE
-export OS_TYPE="$(uname)"
+# set $PATH
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH:$HOME/bin
 
-# $PATH
-export PATH=$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH
+# set standard editor via $EDITOR
+if hash vim; then
+  export EDITOR='vim'
+else
+	export EDITOR='vi'
+fi
 
-# $EDITOR
-export EDITOR='vim'
-
-# man pages color
+# show man pages color
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;33m'
 export LESS_TERMCAP_me=$'\E[0m'
@@ -39,26 +39,19 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
-# zsh fix for ssh host completion from ~/.ssh/config
+# fix for ssh host completion from ~/.ssh/config
 [ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
 
-# needed to keep backgrounded jobs running when exiting zsh:
+# needed to keep backgrounded jobs running
 setopt NO_HUP
 
 # set ls options
 LS_OPTIONS="--color=auto --group-directories-first -F"
 
-# enable ls colorization: 
-if [ "$TERM" != "dumb" ]; then
-  eval "$(dircolors "$zsh"/dircolors)"
-  alias ls="ls $LS_OPTIONS"
-fi
-
 # set $SHELL:
-export SHELL="$(which zsh)"
+# export SHELL="$(which zsh)"
 
 # keychain stuff
-if [[ "$OS_TYPE" == "Linux" ]]; then
 if hash keychain; then
 ssh_cmd="$(which ssh)"
 function ssh () {
@@ -74,14 +67,12 @@ keychain id_rsa >> $HOME/.keychain-output 2>&1
 }
 fi
 
-fi
-
 # grep with color
 alias grep='grep --color=auto'
 
 # enable ls colorization: 
 if [ "$TERM" != "dumb" ]; then
-  eval "$(dircolors "$zsh"/dircolors)"
+  eval "$(dircolors "$mescaline_home"/dircolors)"
   alias ls="ls $LS_OPTIONS"
 fi
 
@@ -96,19 +87,20 @@ alias grep="grep --color='auto'"
 alias less='less -R'
 alias diff='colordiff'
 
-
+# additional zsh options
 unsetopt menu_complete # do not autoselect the first completion entry
 unsetopt flowcontrol
 setopt auto_menu # show completion menu on succesive tab press
 setopt complete_in_word
 setopt always_to_end
 
+# word completion/deletion non-boundary characters
 WORDCHARS=''
 
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ''
 
-# should this be in keybindings?
+# some keybindings
 bindkey -M menuselect '^o' accept-and-infer-next-history
 zstyle ':completion:*:*:*:*:*' menu select
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
@@ -120,7 +112,7 @@ cdpath=(.)
 
 # Use caching so that commands like apt and dpkg complete are useable
 zstyle ':completion::complete:*' use-cache 1
-zstyle ':completion::complete:*' cache-path $ZSH/cache/
+zstyle ':completion::complete:*' cache-path $mescaline_home/cache/
 
 # unless we really want to
 zstyle '*' single-ignored show
@@ -142,6 +134,18 @@ bindkey 'tab' $_
 
 # enable the advanced completion system
 autoload -U compinit && compinit
+
+
+
+export HISTSIZE=2000 
+export HISTFILE="$HOME/.history"
+export SAVEHIST=$HISTSIZE
+setopt hist_ignore_all_dups
+setopt autocd
+
+# When set, you're able to use extended globbing queries such as cp ^*.(tar|bz2|gz) .
+setopt extendedglob
+
 
 
 
