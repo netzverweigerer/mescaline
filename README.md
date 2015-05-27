@@ -12,11 +12,16 @@ the zshrc file to ~/.zshrc.
 
 The following example creates ~/.mescaline with all the files you see in this
 directory, and finally a symbolic link ~/.zshrc in your home directory,
-pointing to ~/.zsh:
+pointing to ~/.zsh.
 
-$ mkdir ~/.mescaline; cp * ~/.mescaline; cd; ln -s .mescaline/zshrc .zshrc
+From *this* directory, you can try running:
 
-That's it, you're done.
+############################################################################
+ $ mkdir ~/.mescaline; cp * ~/.mescaline; cd; ln -s .mescaline/zshrc .zshrc 
+############################################################################
+
+That should get you up and running. If not, email me at <armin@arminius.org>.
+
 
 
 
