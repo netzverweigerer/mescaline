@@ -1,4 +1,5 @@
 #!/bin/sh
+# vim: ts=2 sw=2 sts=2 et
 #
 # simple mescaline setup script
 # written by Arminius <armin@arminius.org>
