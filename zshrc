@@ -1,15 +1,23 @@
 # mescaline for zsh - based on powerline / ezzsh, but this version is
+# vim: ts=2 sw=2 sts=2 et
 # entirely re-written from scratch.
 # Written by Arminius <armin@arminius.org>
-#
+
 # Released under the terms of the GNU General Public License,
 # Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
+# osx detection
+if [[ "$(uname)" == "Darwin" ]]; then
+  osx=1
+else
+  osx=0
+fi
+
 # set mescaline installation location
-mescaline_home="$HOME/.mescaline/"
+mescaline_home="$HOME/git/mescaline"
 
 function _mescaline () {
-  export PROMPT="$(~/.mescaline/mescaline $?)"
+  export PROMPT="$($mescaline_home/mescaline $?)"
 }
 precmd () {
 	_mescaline
@@ -48,23 +56,22 @@ setopt NO_HUP
 # set ls options
 LS_OPTIONS="--color=auto --group-directories-first -F"
 
-# set $SHELL:
-# export SHELL="$(which zsh)"
-
-# keychain stuff
-if hash keychain; then
-ssh_cmd="$(which ssh)"
-function ssh () {
-echo "$@" >> $HOME/.keychain-args
-echo "$(date)" > $HOME/.keychain-output
-keychain id_rsa >> $HOME/.keychain-output 2>&1
-[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
-[ -f $HOME/.keychain/$HOSTNAME-sh ] && \
-. $HOME/.keychain/$HOSTNAME-sh
-[ -f $HOME/.keychain/$HOSTNAME-sh-gpg ] && \
-. $HOME/.keychain/$HOSTNAME-sh-gpg
-"$ssh_cmd" "$@"
-}
+# ssh key management
+if hash keychain >/dev/null 2>&1; then
+  kc="$mescaline_home/keychain/"
+  mkdir -p "$kc"
+  host="$kc/$(uname -n)-sh"
+  used=0; if [[ -f $host ]]; then source $host; used=1; fi
+  sshc="$(which ssh)"
+  function ssh () {
+    if [[ $used ]]; then
+      echo "re-using keychain"
+      "$sshc" "$@"
+    else
+      keychain > $mescaline_home/keychain/log.txt 2>&1
+      "$sshc" "$@"
+    fi
+  }
 fi
 
 # grep with color
@@ -76,10 +83,10 @@ if [ "$TERM" != "dumb" ]; then
   alias ls="ls $LS_OPTIONS"
 fi
 
-# do not autocorrect sudo commands (fixes "zsh: correct 'vim' to '.vim' [nyae]?")
+# disable correction for sudo
 alias sudo='nocorrect sudo'
 
-# the more brutal attempt:
+# disable all other correction
 unsetopt correct{,all} 
 
 # colored grep / less
@@ -97,15 +104,6 @@ setopt always_to_end
 # word completion/deletion non-boundary characters
 WORDCHARS=''
 
-zmodload -i zsh/complist
-zstyle ':completion:*' list-colors ''
-
-# some keybindings
-bindkey -M menuselect '^o' accept-and-infer-next-history
-zstyle ':completion:*:*:*:*:*' menu select
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
-
 # disable named-directories autocompletion
 zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 cdpath=(.)
@@ -117,35 +115,44 @@ zstyle ':completion::complete:*' cache-path $mescaline_home/cache/
 # unless we really want to
 zstyle '*' single-ignored show
 
+# completion - TODO: use more comments here
 expand-or-complete-with-dots() {
-#    echo -n "\e[36mч\e[0m"
-    echo -n "\e[36mᕁ\e[0m"
-    zle expand-or-complete
-    zle redisplay
-  }
-  zle -N expand-or-complete-with-dots
-  bindkey "^I" expand-or-complete-with-dots
+  echo -n "\e[36mᕁ\e[0m"
+  zle expand-or-complete
+  zle redisplay
+}
+zle -N expand-or-complete-with-dots
+bindkey "^I" expand-or-complete-with-dots
+zmodload -i zsh/complist
+zstyle ':completion:*' list-colors ''
+bindkey -M menuselect '^o' accept-and-infer-next-history
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
 
-# set backspace boundaries
+# TODO: find description for this magic:
 autoload -Uz select-word-style
 $_ bash
 zle -N backward-kill-word-match
 bindkey 'tab' $_
 
-# enable the advanced completion system
+# enable completion system
 autoload -U compinit && compinit
 
-
-
+# set history options
 export HISTSIZE=2000 
 export HISTFILE="$HOME/.history"
 export SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
+
+# use autocd feature
 setopt autocd
 
 # When set, you're able to use extended globbing queries such as cp ^*.(tar|bz2|gz) .
 setopt extendedglob
 
-
+if [[ "$(uname)" == "Darwin" ]]; then
+  osx=1
+fi
 
 
