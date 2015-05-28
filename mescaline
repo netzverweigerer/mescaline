@@ -6,6 +6,7 @@ import subprocess
 import sys
 import re
 import getpass
+import socket
 
 encoding = sys.getdefaultencoding()
 
@@ -13,29 +14,21 @@ def warn(msg):
     print('[mescaline-zsh] ', msg)
 
 class Color:
-    # see: http://www.calmar.ws/vim/color-output.png
-
-    path_bg = 237  # dark grey
-    path_fg = 250  # light grey
-    cwd_fg = 254  # nearly-white grey
+    path_bg = 237
+    path_fg = 250
+    cwd_fg = 254
     separator_fg = 244
-
-    repo_clean_bg = 148  # a light green color
-    repo_clean_fg = 0  # black
-    repo_dirty_bg = 161  # pink/red
-    repo_dirty_fg = 15  # white
-
-    # prompt color if previous command exited 0:
+    repo_clean_bg = 148
+    repo_clean_fg = 0
+    repo_dirty_bg = 161
+    repo_dirty_fg = 15
     cmd_passed_bg = 236
     cmd_passed_fg = 242
-    # prompt color if previous command exited != 0:
     cmd_failed_bg = 161
     cmd_failed_fg = 15
-
     svn_changes_bg = 148
-    svn_changes_fg = 22  # dark green
-
-    virtual_env_bg = 35  # a mid-tone green
+    svn_changes_fg = 22
+    virtual_env_bg = 35
     virtual_env_fg = 22
 
 class Mescaline:
@@ -43,7 +36,6 @@ class Mescaline:
         'separator': '',
         'separator_thin': ''
     }
-    LSQESCRSQ = '\\[\\e%s\\]'
     reset = ' %f%k'
 
     def __init__(self):
@@ -92,7 +84,6 @@ class Segment:
             mescaline.fgcolor(self.separator_fg),
             self.separator))
 
-
 def add_cwd_segment(mescaline, cwd, maxdepth):
     home = os.getenv('HOME')
     cwd = os.getenv('PWD')
@@ -112,7 +103,6 @@ def add_cwd_segment(mescaline, cwd, maxdepth):
 
     mescaline.append(Segment(mescaline, ' %s ' % names[-1], Color.cwd_fg, Color.path_bg))
 
-
 def get_hg_status():
     has_modified_files = False
     has_untracked_files = False
@@ -128,7 +118,6 @@ def get_hg_status():
         else:
             has_modified_files = True
     return has_modified_files, has_untracked_files, has_missing_files
-
 
 def add_hg_segment(mescaline, cwd):
     branch = os.popen('hg branch 2> /dev/null').read().rstrip()
@@ -149,7 +138,6 @@ def add_hg_segment(mescaline, cwd):
     mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
     return True
 
-
 def get_git_status():
     has_pending_commits = True
     has_untracked_files = False
@@ -169,7 +157,6 @@ def get_git_status():
         if line.find('Untracked files') >= 0:
             has_untracked_files = True
     return has_pending_commits, has_untracked_files, origin_position
-
 
 def add_git_segment(mescaline, cwd):
     p = subprocess.Popen(['git', 'symbolic-ref', '-q', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -198,7 +185,6 @@ def add_git_segment(mescaline, cwd):
 
     mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
     return True
-
 
 def add_svn_segment(mescaline, cwd):
     if not os.path.exists(os.path.join(cwd, '.svn')):
@@ -230,7 +216,6 @@ def add_svn_segment(mescaline, cwd):
         return False
     return True
 
-
 def add_repo_segment(mescaline, cwd):
     for add_repo_segment in [add_git_segment, add_svn_segment, add_hg_segment]:
         try:
@@ -240,8 +225,6 @@ def add_repo_segment(mescaline, cwd):
             pass
         except OSError:
             pass
-
-
 def add_virtual_env_segment(mescaline, cwd):
     env = os.getenv("VIRTUAL_ENV")
     if env is None:
@@ -249,7 +232,7 @@ def add_virtual_env_segment(mescaline, cwd):
     env_name = os.path.basename(env)
     bg = Color.virtual_env_bg
     fg = Color.virtual_env_fg
-    mescaline.append(Segment(mescaline, ' %s ' % env_name, fg, bg))
+    mescaline.append(Segment(mescaline, ' virtualenv: %s ' % env_name, fg, bg))
     return True
 
 def add_username_segment(mescaline, username):
@@ -270,7 +253,7 @@ def get_valid_cwd():
     try:
         cwd = os.getcwd()
     except:
-        cwd = os.getenv('PWD')  # This is where the OS thinks we are
+        cwd = os.getenv('PWD')
         parts = cwd.split(os.sep)
         up = cwd
         while parts and not os.path.exists(up):
@@ -286,11 +269,17 @@ def get_valid_cwd():
 
 def get_username():
     return getpass.getuser()
+def get_hostname():
+    return socket.gethostname()
 
 if __name__ == '__main__':
     p = Mescaline()
+
     username = get_username()
-    add_username_segment(p, username)
+    hostname = get_hostname()
+    txt = username + "@" + hostname
+    add_username_segment(p, txt)
+
     cwd = get_valid_cwd()
     add_virtual_env_segment(p, cwd)
     add_cwd_segment(p, cwd, 5)
