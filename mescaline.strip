@@ -15,28 +15,28 @@ def warn(msg):
 class Color:
     # see: http://www.calmar.ws/vim/color-output.png
 
-    path_bg = 237  # dark grey
-    path_fg = 250  # light grey
-    cwd_fg = 254  # nearly-white grey
-    separator_fg = 244
+    PATH_BG = 237  # dark grey
+    PATH_FG = 250  # light grey
+    CWD_FG = 254  # nearly-white grey
+    SEPARATOR_FG = 244
 
-    repo_clean_bg = 148  # a light green color
-    repo_clean_fg = 0  # black
-    repo_dirty_bg = 161  # pink/red
-    repo_dirty_fg = 15  # white
+    REPO_CLEAN_BG = 148  # a light green color
+    REPO_CLEAN_FG = 0  # black
+    REPO_DIRTY_BG = 161  # pink/red
+    REPO_DIRTY_FG = 15  # white
 
     # prompt color if previous command exited 0:
-    cmd_passed_bg = 236
-    cmd_passed_fg = 242
+    CMD_PASSED_BG = 236
+    CMD_PASSED_FG = 242
     # prompt color if previous command exited != 0:
-    cmd_failed_bg = 161
-    cmd_failed_fg = 15
+    CMD_FAILED_BG = 161
+    CMD_FAILED_FG = 15
 
-    svn_changes_bg = 148
-    svn_changes_fg = 22  # dark green
+    SVN_CHANGES_BG = 148
+    SVN_CHANGES_FG = 22  # dark green
 
-    virtual_env_bg = 35  # a mid-tone green
-    virtual_env_fg = 22
+    VIRTUAL_ENV_BG = 35  # a mid-tone green
+    VIRTUAL_ENV_FG = 22
 
 class Mescaline:
     symbols = {
@@ -108,9 +108,9 @@ def add_cwd_segment(mescaline, cwd, maxdepth):
         names = names[:2] + ['⋯ '] + names[2 - maxdepth:]
 
     for n in names[:-1]:
-        mescaline.append(Segment(mescaline, ' %s ' % n, Color.path_fg, Color.path_bg, mescaline.separator_thin, Color.separator_fg))
+        mescaline.append(Segment(mescaline, ' %s ' % n, Color.PATH_FG, Color.PATH_BG, mescaline.separator_thin, Color.SEPARATOR_FG))
 
-    mescaline.append(Segment(mescaline, ' %s ' % names[-1], Color.cwd_fg, Color.path_bg))
+    mescaline.append(Segment(mescaline, ' %s ' % names[-1], Color.CWD_FG, Color.PATH_BG))
 
 
 def get_hg_status():
@@ -134,12 +134,12 @@ def add_hg_segment(mescaline, cwd):
     branch = os.popen('hg branch 2> /dev/null').read().rstrip()
     if len(branch) == 0:
         return False
-    bg = Color.repo_clean_bg
-    fg = Color.repo_clean_fg
+    bg = Color.REPO_CLEAN_BG
+    fg = Color.REPO_CLEAN_FG
     has_modified_files, has_untracked_files, has_missing_files = get_hg_status()
     if has_modified_files or has_untracked_files or has_missing_files:
-        bg = Color.repo_dirty_bg
-        fg = Color.repo_dirty_fg
+        bg = Color.REPO_DIRTY_BG
+        fg = Color.REPO_DIRTY_FG
         extra = ''
         if has_untracked_files:
             extra += '+'
@@ -189,12 +189,12 @@ def add_git_segment(mescaline, cwd):
     if has_untracked_files:
         branch += ' +'
 
-    bg = Color.repo_clean_bg
-    fg = Color.repo_clean_fg
+    bg = Color.REPO_CLEAN_BG
+    fg = Color.REPO_CLEAN_FG
 
     if has_pending_commits:
-        bg = Color.repo_dirty_bg
-        fg = Color.repo_dirty_fg
+        bg = Color.REPO_DIRTY_BG
+        fg = Color.REPO_DIRTY_FG
 
     mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
     return True
@@ -223,7 +223,7 @@ def add_svn_segment(mescaline, cwd):
         output = p2.communicate()[0].strip()
         if len(output) > 0 and int(output) > 0:
             changes = output.strip()
-            mescaline.append(Segment(mescaline, ' %s ' % changes, Color.svn_changes_fg, Color.svn_changes_bg))
+            mescaline.append(Segment(mescaline, ' %s ' % changes, Color.SVN_CHANGES_FG, Color.SVN_CHANGES_BG))
     except OSError:
         return False
     except subprocess.CalledProcessError:
@@ -247,23 +247,23 @@ def add_virtual_env_segment(mescaline, cwd):
     if env is None:
         return False
     env_name = os.path.basename(env)
-    bg = Color.virtual_env_bg
-    fg = Color.virtual_env_fg
+    bg = Color.VIRTUAL_ENV_BG
+    fg = Color.VIRTUAL_ENV_FG
     mescaline.append(Segment(mescaline, ' %s ' % env_name, fg, bg))
     return True
 
 def add_username_segment(mescaline, username):
-    bg = Color.virtual_env_bg
-    fg = Color.virtual_env_fg
+    bg = Color.VIRTUAL_ENV_BG
+    fg = Color.VIRTUAL_ENV_FG
     mescaline.append(Segment(mescaline, ' %s ' % username, fg, bg))
     return True
 
 def add_root_indicator(mescaline, error):
-    bg = Color.cmd_passed_bg
-    fg = Color.cmd_passed_fg
+    bg = Color.CMD_PASSED_BG
+    fg = Color.CMD_PASSED_FG
     if int(error) != 0:
-        fg = Color.cmd_failed_fg
-        bg = Color.cmd_failed_bg
+        fg = Color.CMD_FAILED_FG
+        bg = Color.CMD_FAILED_BG
     mescaline.append(Segment(mescaline, '', fg, bg))
 
 def get_valid_cwd():
