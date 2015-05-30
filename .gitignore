@@ -1,6 +1,6 @@
 *.swo
 *.swp
-cache/
+cache/*
 *.tmp
 *.bak
 

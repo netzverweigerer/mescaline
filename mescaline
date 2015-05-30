@@ -235,7 +235,7 @@ def add_virtual_env_segment(mescaline, cwd):
     mescaline.append(Segment(mescaline, ' virtualenv: %s ' % env_name, fg, bg))
     return True
 
-def add_username_segment(mescaline, username):
+def add_userathost_segment(mescaline, username):
     bg = Color.virtual_env_bg
     fg = Color.virtual_env_fg
     mescaline.append(Segment(mescaline, ' %s ' % username, fg, bg))
@@ -277,9 +277,8 @@ if __name__ == '__main__':
 
     username = get_username()
     hostname = get_hostname()
-    txt = username + "@" + hostname
-    add_username_segment(p, txt)
-
+    userathost = username + "@" + hostname
+    add_userathost_segment(p, userathost)
     cwd = get_valid_cwd()
     add_virtual_env_segment(p, cwd)
     add_cwd_segment(p, cwd, 5)
