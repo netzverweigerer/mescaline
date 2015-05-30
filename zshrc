@@ -17,6 +17,13 @@ precmd () {
 	_mescaline
 }
 
+# osx specifics
+if [[ "$(uname)" == "Darwin" ]]; then
+  osx=1
+else
+  osx=0
+fi
+
 # force $TERM on rxvt
 if [[ "$COLORTERM" == "rxvt-xpm" ]]; then
   export TERM="rxvt-unicode-256color"
@@ -53,7 +60,7 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 setopt NO_HUP
 
 # set ls options
-LS_OPTIONS="--color=auto --group-directories-first -F"
+ls_options="--color=auto --group-directories-first -F"
 
 # keychain
 if hash keychain; then
@@ -69,11 +76,27 @@ fi
 # grep with color
 alias grep='grep --color=auto'
 
+# OS X specifics - allows us to use some GNU coreutils overrides.
+# we use variables here, as aliasing aliases may not work.
+if [[ "$osx" ]]; then
+  dircolors_command="gdircolors"
+  ls_command="gls"
+else
+  dircolors_command="dircolors"
+  ls_command="ls"
+fi
+
 # enable ls colorization: 
-if [ "$TERM" != "dumb" ]; then
-  eval "$(dircolors "$mescaline_home"/dircolors)"
-	export LS_OPTIONS
-  alias ls="ls $LS_OPTIONS"
+if [[ "$TERM" != "dumb" ]]; then
+  # this sets $LS_COLORS as well:
+  eval "$("$dircolors_command" "$mescaline_home"/dircolors)"
+  export ls_options
+  export LS_COLORS
+  alias ls="$ls_command $ls_options"
+  # colored grep / less
+  alias grep="grep --color='auto'"
+  alias less='less -R'
+  alias diff='colordiff'
 fi
 
 # disable auto correction (sudo)
@@ -81,11 +104,6 @@ alias sudo='nocorrect sudo'
 
 # disable auto correction (global)
 unsetopt correct{,all} 
-
-# colored grep / less
-alias grep="grep --color='auto'"
-alias less='less -R'
-alias diff='colordiff'
 
 # don't select first tab menu entry
 unsetopt menu_complete
@@ -101,7 +119,8 @@ setopt complete_in_word
 setopt always_to_end
 
 # word characters
-WORDCHARS=''
+# WORDCHARS='-'
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # load complist mod
 zmodload -i zsh/complist
@@ -155,5 +174,11 @@ setopt hist_ignore_all_dups
 
 # automatically cd to dir without "cd" needed
 setopt autocd
+
+# let's us select keymaps
+zle -N zle-keymap-select
+
+# use emacs line editing (command prompt input) mode
+bindkey -e
 
 
