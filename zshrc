@@ -144,8 +144,9 @@ setopt extendedglob
 # don't complete first match (wildcard match)
 zstyle '*' single-ignored show
 
-# enable completion system
-autoload -U compinit && compinit
+# enable completion system (-i: disable check for insecure
+# files/directories)
+autoload -U compinit && compinit -i
 
 # use expand-or-complete-with-dots
 zle -N expand-or-complete-with-dots
@@ -161,7 +162,7 @@ bindkey 'tab' expand-or-complete-with-dots
 autoload -Uz select-word-style
 
 # it's magic!
-$_ bash
+select-word-style bash
 
 # enable backward-kill-word-match
 zle -N backward-kill-word-match
@@ -175,10 +176,10 @@ setopt hist_ignore_all_dups
 # automatically cd to dir without "cd" needed
 setopt autocd
 
-# let's us select keymaps
+# this let's us select keymaps (command prompt input mode)
 zle -N zle-keymap-select
 
-# use emacs line editing (command prompt input) mode
+# use emacs line editing (command prompt input mode)
 bindkey -e
 
 
