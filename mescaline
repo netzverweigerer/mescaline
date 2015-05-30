@@ -11,7 +11,7 @@ import socket
 encoding = sys.getdefaultencoding()
 
 def warn(msg):
-    print('[mescaline-zsh] ', msg)
+    print('[mescaline] ', msg)
 
 class Color:
     path_bg = 237
