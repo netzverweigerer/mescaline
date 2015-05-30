@@ -1,35 +1,41 @@
-#
-# [mescaline] zshrc for zsh - based on powerline / ezzsh, but this version is
+# mescaline for zsh - based on powerline / ezzsh, but this version is
 # entirely re-written from scratch.
+# Written by Arminius <armin@arminius.org>
 #
-# version ##version##; written and copyright by Armin Jenewein.
-#
-# set vim indenting if ":set modeline" is used in vim
-# vim: ts=2 sw=2 sts=2 et
-#
-# mescaline is released under the terms of the GNU General Public License,
-# Version 3, © Free Software Foundation Inc., http://fsf.org/
-#
-# This is free (as in "freedom") software, without ANY warranty,
-# but with best wishes and written in the hope that you may find it useful.
+# Released under the terms of the GNU General Public License,
+# Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
 # set mescaline installation location
-mescaline_home="$HOME/git/mescaline"
+mescaline_home="$HOME/git/mescaline/"
 
-function _mescaline () {
+_mescaline () {
   export PROMPT="$($mescaline_home/mescaline $?)"
 }
+
+# call _mescaline function
 precmd () {
 	_mescaline
 }
 
-# force $TERM on rxvt-xpm compatible rxvt
-if [[ "$COLORTERM" == "rxvt-xpm" ]]; then
-    export TERM="rxvt-unicode-256color"
+# osx specifics
+if [[ "$(uname)" == "Darwin" ]]; then
+  osx=1
+else
+  osx=0
 fi
 
-# set $PATH variable (notice the *appended* ~/bin)
-export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/bin"
+# force $TERM on rxvt
+if [[ "$COLORTERM" == "rxvt-xpm" ]]; then
+  export TERM="rxvt-unicode-256color"
+fi
+
+# force $TERM on xfce4-terminal
+if [[ "$COLORTERM" == "xfce4-terminal" ]]; then
+  export TERM="xterm-256color"
+fi
+
+# set $PATH
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH:"
 
 # set standard editor via $EDITOR
 if hash vim; then
@@ -47,121 +53,132 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
-# enable dirty zsh ssh host completion workaround hack for ~/.ssh/config
-# : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
+# fix for ssh host completion from ~/.ssh/config (yes, this is ugly, sorry for this)
+[ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
 
-# keep backgrounded jobs running
+# needed to keep backgrounded jobs running
 setopt NO_HUP
 
 # set ls options
-LS_OPTIONS="--color=auto --group-directories-first -F"
+ls_options="--color=auto --group-directories-first -F"
 
-# set $osx variable to 1 if we are on OS X
-if [[ "$(uname)" == "Darwin" ]]; then
-  osx=1
-else
-  osx=0
+# keychain
+if hash keychain; then
+	_s="$(which ssh)"
+	ssh () {
+		keychain >/dev/null 2>&1
+		h="$(uname -n)-sh"
+		[ -f $h ] && . $h
+		$_s "$@"
+	}
 fi
 
-# osx specific settings:
+# grep with color
+alias grep='grep --color=auto'
+
+# OS X specifics - allows us to use some GNU coreutils overrides.
+# we use variables here, as aliasing aliases may not work.
 if [[ "$osx" ]]; then
-  # homebrew setup
-  if hash brew; then
-    # preceed path with homebrew stuff:
-    export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
-    # enable homebrew verbosity
-    export HOMEBREW_VERBOSE=1
-    export HOMEBREW_CURL_VERBOSE=1
-    # disable homebrew emoji:
-    export HOMEBREW_NO_EMOJI=1
-   fi
-  # alias for custom ipython from ~/git from ~/git/ipython
-  if [[ -f $HOME/git/ipython/bin/ipython ]]; then
-    alias ipython="$HOME/git/ipython/bin/ipython"
-  fi
-  # use ls from GNU coreutils because the oldschool bsd ls doesn't know long
-  # options like --group-directories-first
-  if hash gls; then
-    LS_COMMAND="gls"
-  else
-    LS_COMMAND="ls"
-  fi
-  # same for dircolors
-  if hash gdircolors; then alias dircolors="gdircolors"; fi
+  dircolors_command="gdircolors"
+  ls_command="gls"
 else
-  # use normal "ls" command on non-osx systems
-  LS_COMMAND="ls"
+  dircolors_command="dircolors"
+  ls_command="ls"
 fi
 
-# finally, set alias for ls
-alias ls="$LS_COMMAND $LS_OPTIONS"
+# enable ls colorization: 
+if [[ "$TERM" != "dumb" ]]; then
+  # this sets $LS_COLORS as well:
+  eval "$("$dircolors_command" "$mescaline_home"/dircolors)"
+  export ls_options
+  export LS_COLORS
+  alias ls="$ls_command $ls_options"
+  # colored grep / less
+  alias grep="grep --color='auto'"
+  alias less='less -R'
+  alias diff='colordiff'
+fi
 
-# enable dircolors
-eval "$(dircolors "$mescaline_home"/dircolors)"
-
-# disable correction for sudo
+# disable auto correction (sudo)
 alias sudo='nocorrect sudo'
 
-# disable all other correction
+# disable auto correction (global)
 unsetopt correct{,all} 
 
-# colored grep / less
-alias grep="grep --color='auto'"
-alias less='less -R'
-alias diff='colordiff'
+# don't select first tab menu entry
+unsetopt menu_complete
 
-# additional zsh options
-unsetopt menu_complete # do not autoselect the first completion entry
+# disable flowcontrol
 unsetopt flowcontrol
-setopt auto_menu # show completion menu on succesive tab press
+
+# enable tab completion menu
+setopt auto_menu
+
+# enable in-word completion
 setopt complete_in_word
 setopt always_to_end
 
-# word completion/deletion non-boundary characters
-WORDCHARS=''
+# word characters
+# WORDCHARS='-'
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
+# load complist mod
+zmodload -i zsh/complist
+
+# completion list color definitions
+zstyle ':completion:*' list-colors ''
+
+# enable in-menu keybindings
+bindkey -M menuselect '^o' accept-and-infer-next-history
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
 
 # disable named-directories autocompletion
 zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 cdpath=(.)
 
-# if glob returns multiple matches, abort
+# allow extended globbing
+setopt extendedglob
+
+# don't complete first match (wildcard match)
 zstyle '*' single-ignored show
-
-# completion setup
-expand-or-complete-with-dots() {
-  echo -n "\e[36mᕁ\e[0m"
-  zle expand-or-complete
-  zle redisplay
-}
-zle -N expand-or-complete-with-dots
-bindkey "^I" expand-or-complete-with-dots
-zmodload -i zsh/complist
-zstyle ':completion:*' list-colors ''
-bindkey -M menuselect '^o' accept-and-infer-next-history
-zstyle ':completion:*:*:*:*:*' menu select
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
-
-# word selection style
-autoload -Uz select-word-style
-select-word-style bash
-zle -N backward-kill-word-match
-bindkey 'tab' backward-kill-word-match
 
 # enable completion system
 autoload -U compinit && compinit
 
-# set history options
+# use expand-or-complete-with-dots
+zle -N expand-or-complete-with-dots
+expand-or-complete-with-dots() {
+    echo -n "\e[36mᕁ\e[0m"
+    zle expand-or-complete
+    zle redisplay
+}
+bindkey "^I" expand-or-complete-with-dots
+bindkey 'tab' expand-or-complete-with-dots
+
+# load "select-word-style"
+autoload -Uz select-word-style
+
+# it's magic!
+$_ bash
+
+# enable backward-kill-word-match
+zle -N backward-kill-word-match
+
+# history options 
 export HISTSIZE=2000 
 export HISTFILE="$HOME/.history"
-export SAVEHIST="$HISTSIZE"
+export SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
 
-# use autocd feature
+# automatically cd to dir without "cd" needed
 setopt autocd
 
-# use extended globbing queries - example: cp ^*.(tar|bz2|gz) .
-setopt extendedglob
+# let's us select keymaps
+zle -N zle-keymap-select
 
-# EOF
+# use emacs line editing (command prompt input) mode
+bindkey -e
+
 

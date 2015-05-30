@@ -11,7 +11,7 @@ import socket
 encoding = sys.getdefaultencoding()
 
 def warn(msg):
-    print('[mescaline-zsh] ', msg)
+    print('[mescaline] ', msg)
 
 class Color:
     path_bg = 237
@@ -142,8 +142,13 @@ def get_git_status():
     has_pending_commits = True
     has_untracked_files = False
     origin_position = ""
-    output = subprocess.Popen(['git', 'status', '-unormal'], stdout=subprocess.PIPE).communicate()[0]
-    for line in output.decode(encoding).split('\n'):
+    try:
+        s = subprocess.Popen(['git', 'status', '-unormal'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = s.communicate()
+    except:
+        return False
+
+    for line in out.decode(encoding).split('\n'):
         origin_status = re.findall("Your branch is (ahead|behind).*?(\d+) comm", line)
         if len(origin_status) > 0:
             origin_position = " %d" % int(origin_status[0][1])
@@ -159,20 +164,22 @@ def get_git_status():
     return has_pending_commits, has_untracked_files, origin_position
 
 def add_git_segment(mescaline, cwd):
-    p = subprocess.Popen(['git', 'symbolic-ref', '-q', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
-
-    if 'Not a git repo' in err.decode(encoding):
-        return False
+    s = subprocess.Popen(['git', 'symbolic-ref', '-q', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = s.communicate()
 
     if out:
-        branch = out[len('refs/heads/'):].rstrip()
+        branch = out[len('refs/heads/'):].rstrip().decode('ASCII')
     else:
-        branch = '(Detached)'
+        if err.startswith('fatal: Not a git repository'.encode('utf-8')):
+            return False 
+        else:
+            branch = '(Detached)'
 
-    branch = branch.decode(encoding)
     has_pending_commits, has_untracked_files, origin_position = get_git_status()
-    branch += origin_position
+
+    if not (len(origin_position)) == 0:
+        branch += origin_position
+
     if has_untracked_files:
         branch += ' +'
 
@@ -235,7 +242,7 @@ def add_virtual_env_segment(mescaline, cwd):
     mescaline.append(Segment(mescaline, ' virtualenv: %s ' % env_name, fg, bg))
     return True
 
-def add_userathost_segment(mescaline, username):
+def add_username_segment(mescaline, username):
     bg = Color.virtual_env_bg
     fg = Color.virtual_env_fg
     mescaline.append(Segment(mescaline, ' %s ' % username, fg, bg))
@@ -270,15 +277,16 @@ def get_valid_cwd():
 def get_username():
     return getpass.getuser()
 def get_hostname():
-    return socket.gethostname()
+    return socket.gethostname().split('.')[0]
 
 if __name__ == '__main__':
     p = Mescaline()
 
     username = get_username()
     hostname = get_hostname()
-    userathost = username + "@" + hostname
-    add_userathost_segment(p, userathost)
+    txt = username + "@" + hostname
+    add_username_segment(p, txt)
+
     cwd = get_valid_cwd()
     add_virtual_env_segment(p, cwd)
     add_cwd_segment(p, cwd, 5)
