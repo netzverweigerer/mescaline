@@ -78,7 +78,7 @@ alias grep='grep --color=auto'
 
 # OS X specifics - allows us to use some GNU coreutils overrides.
 # we use variables here, as aliasing aliases may not work.
-if [[ "$osx" ]]; then
+if [[ "$osx" -gt 0 ]]; then
   dircolors_command="gdircolors"
   ls_command="gls"
 else
