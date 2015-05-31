@@ -10,9 +10,6 @@ import socket
 
 encoding = sys.getdefaultencoding()
 
-def warn(msg):
-    print('[mescaline] ', msg)
-
 class Color:
     path_bg = 237
     path_fg = 250
@@ -88,6 +85,12 @@ class Segment:
             mescaline.fgcolor(self.separator_fg),
             self.separator))
 
+# prints a warning message
+def warn(msg):
+    print('[mescaline] ', msg)
+
+
+# adds a current working directory segment
 def add_cwd_segment(mescaline, cwd, maxdepth):
     home = os.getenv('HOME')
     cwd = os.getenv('PWD')
@@ -200,20 +203,6 @@ def add_git_segment(mescaline, cwd):
 def add_svn_segment(mescaline, cwd):
     if not os.path.exists(os.path.join(cwd, '.svn')):
         return
-    '''svn info:
-        First column: Says if item was added, deleted, or otherwise changed
-        ' ' no modifications
-        'A' Added
-        'C' Conflicted
-        'D' Deleted
-        'I' Ignored
-        'M' Modified
-        'R' Replaced
-        'X' an unversioned directory created by an externals definition
-        '?' item is not under version control
-        '!' item is missing (removed by non-svn command) or incomplete
-         '~' versioned item obstructed by some item of a different kind
-    '''
     try:
         p1 = subprocess.Popen(['svn', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p2 = subprocess.Popen(['grep', '-c', '^[ACDIMRX\\!\\~]'], stdin=p1.stdout, stdout=subprocess.PIPE)
@@ -227,16 +216,18 @@ def add_svn_segment(mescaline, cwd):
         return False
     return True
 
+# adds repo segments for git/svn/hg
 def add_repo_segment(mescaline, cwd):
     for add_repo_segment in [add_git_segment, add_svn_segment, add_hg_segment]:
         try:
-            if add_repo_segment(p, cwd):
+            if add_repo_segment(m, cwd):
                 return
         except subprocess.CalledProcessError:
             pass
         except OSError:
             pass
 
+# adds a python virtualenv segment
 def add_virtualenv_segment(mescaline, cwd):
     env = os.getenv("VIRTUAL_ENV")
     if env is None:
@@ -247,6 +238,7 @@ def add_virtualenv_segment(mescaline, cwd):
     mescaline.append(Segment(mescaline, ' virtualenv: %s ' % env_name, fg, bg))
     return True
 
+# adds a username segment
 def add_username_segment(mescaline, username):
     if 'root' in username:
         bg = Color.root_bg
@@ -257,6 +249,7 @@ def add_username_segment(mescaline, username):
     mescaline.append(Segment(mescaline, ' %s ' % username, fg, bg))
     return True
 
+# adds an exitcode ($? != 0) indicator
 def add_exitcode_indicator(mescaline, error):
     if int(error) != 0:
         fg = Color.cmd_failed_fg
@@ -266,7 +259,7 @@ def add_exitcode_indicator(mescaline, error):
         fg = Color.cmd_passed_fg
     mescaline.append(Segment(mescaline, '', fg, bg))
 
-
+# gets the last valid upper directory
 def get_valid_cwd():
     try:
         cwd = os.getcwd()
@@ -280,37 +273,40 @@ def get_valid_cwd():
         try:
             os.chdir(up)
         except:
-            warn("Your current directory is invalid.")
+            warn("is invalid.")
             sys.exit(1)
-        warn("Your current directory is invalid. Lowest valid directory: " + up)
+        warn("CWD is invalid. Lowest valid directory: " + up)
     return cwd
 
+# gets the username
 def get_username():
     return getpass.getuser()
+
+# gets the hostname
 def get_hostname():
     return socket.gethostname().split('.')[0]
 
-
+# main code
 if __name__ == '__main__':
-    p = Mescaline()
+    m = Mescaline()
 
     username = get_username()
     hostname = get_hostname()
     txt = username + "@" + hostname
-    add_username_segment(p, txt)
+    add_username_segment(m, txt)
 
 
     cwd = get_valid_cwd()
-    add_virtualenv_segment(p, cwd)
-    add_cwd_segment(p, cwd, 5)
-    add_repo_segment(p, cwd)
+    add_virtualenv_segment(m, cwd)
+    add_cwd_segment(m, cwd, 5)
+    add_repo_segment(m, cwd)
 
     if int(sys.argv[1]) > 0:
-        add_exitcode_indicator(p, sys.argv[1])
+        add_exitcode_indicator(m, sys.argv[1])
 
     if sys.version_info[0] < 3:
-        sys.stdout.write(p.draw().encode('utf-8'))
+        sys.stdout.write(m.draw().encode('utf-8'))
     else:
-        sys.stdout.buffer.write(p.draw().encode('utf-8'))
+        sys.stdout.buffer.write(m.draw().encode('utf-8'))
 
 
