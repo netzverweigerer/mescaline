@@ -21,8 +21,8 @@ class Color:
     repo_dirty_fg = 15
     cmd_passed_bg = 236
     cmd_passed_fg = 242
-    cmd_failed_bg = 161
-    cmd_failed_fg = 15
+    cmd_failed_bg = 236
+    cmd_failed_fg = 161
     svn_changes_bg = 148
     svn_changes_fg = 22
     root_bg = 20
@@ -257,7 +257,7 @@ def add_exitcode_indicator(mescaline, error):
     else:
         bg = Color.cmd_passed_bg
         fg = Color.cmd_passed_fg
-    mescaline.append(Segment(mescaline, '', fg, bg))
+    mescaline.append(Segment(mescaline, ' ' + str(error), fg, bg))
 
 # gets the last valid upper directory
 def get_valid_cwd():

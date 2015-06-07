@@ -62,17 +62,6 @@ setopt NO_HUP
 # set ls options
 ls_options="--color=auto --group-directories-first -F"
 
-# keychain
-if hash keychain; then
-	_s="$(which ssh)"
-	ssh () {
-		keychain >/dev/null 2>&1
-		h="$(uname -n)-sh"
-		[ -f $h ] && . $h
-		$_s "$@"
-	}
-fi
-
 # grep with color
 alias grep='grep --color=auto'
 
@@ -131,6 +120,7 @@ zstyle ':completion:*' list-colors ''
 # enable in-menu keybindings
 bindkey -M menuselect '^o' accept-and-infer-next-history
 zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:*:*:*:*' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=00;33=0=01'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
 
@@ -181,5 +171,9 @@ zle -N zle-keymap-select
 
 # use emacs line editing (command prompt input mode)
 bindkey -e
+
+# source $HOME/git/mescaline/ssh/ssh.zsh
+
+alias apt="sudo apt"
 
 
