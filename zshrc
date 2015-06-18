@@ -10,6 +10,7 @@ mescaline_home="$HOME/git/mescaline/"
 
 _mescaline () {
   export PROMPT="$($mescaline_home/mescaline $?)"
+	print -Pn "\e]0;%n@%m: %~\a"
 }
 
 # call _mescaline function
@@ -61,9 +62,6 @@ setopt NO_HUP
 
 # set ls options
 ls_options="--color=auto --group-directories-first -F"
-
-# grep with color
-alias grep='grep --color=auto'
 
 # OS X specifics - allows us to use some GNU coreutils overrides.
 # we use variables here, as aliasing aliases may not work.
@@ -172,8 +170,30 @@ zle -N zle-keymap-select
 # use emacs line editing (command prompt input mode)
 bindkey -e
 
-# source $HOME/git/mescaline/ssh/ssh.zsh
+_ssh-agent-wrapper () {
+	source $HOME/bin/ssh-check-identities
+	ssh "$@"
+}
 
-alias apt="sudo apt"
+compdef g='git'
+alias g='git'
+
+
+compdef s='ssh'
+alias s='ssh'
+
+if [[ -n $SSH_AGENT_SETTINGS ]]; then
+	eval "$SSH_AGENT_SETTINGS"
+else
+	echo "SSH_AGENT_SETTINGS is unset."
+fi
+
+# alias ssh="_ssh-agent-wrapper"
+
+alias bspwm-edit-config="vi $HOME/git/bspwm/config"
+
+alias dzen2='dzen2 -fn verdana-7 -bg "#262626"'
+
+$HOME/bin/space-invaders.sh
 
 
