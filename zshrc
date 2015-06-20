@@ -170,29 +170,18 @@ zle -N zle-keymap-select
 # use emacs line editing (command prompt input mode)
 bindkey -e
 
-_ssh-agent-wrapper () {
-	source $HOME/bin/ssh-check-identities
-	ssh "$@"
-}
-
-compdef g='git'
-alias g='git'
-
-
 compdef s='ssh'
 alias s='ssh'
 
 if [[ -n $SSH_AGENT_SETTINGS ]]; then
 	eval "$SSH_AGENT_SETTINGS"
-else
-	echo "SSH_AGENT_SETTINGS is unset."
 fi
 
-# alias ssh="_ssh-agent-wrapper"
-
 alias bspwm-edit-config="vi $HOME/git/bspwm/config"
-
 alias dzen2='dzen2 -fn verdana-7 -bg "#262626"'
+
+compdef g='git'
+alias g='git'
 
 $HOME/bin/space-invaders.sh
 
