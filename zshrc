@@ -9,8 +9,18 @@
 mescaline_home="$HOME/git/mescaline/"
 
 _mescaline () {
-  export PROMPT="$($mescaline_home/mescaline $?)"
-	print -Pn "\e]0;%n@%m: %~\a"
+
+if [[ ! "$TERM" == linux ]]; then;
+	if [[ "$TERM" != "dumb" ]]; then
+		export PROMPT="$($mescaline_home/mescaline $?)"
+	else
+		export PROMPT="[zsh] > "
+	fi
+else
+  export PROMPT="[zsh] > "
+fi
+
+print -Pn "\e]0;%n@%m: %~\a"
 }
 
 # call _mescaline function
@@ -45,15 +55,6 @@ else
 	export EDITOR='vi'
 fi
 
-# show man pages color
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;33m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
 # fix for ssh host completion from ~/.ssh/config (yes, this is ugly, sorry for this)
 [ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
 
@@ -75,6 +76,14 @@ fi
 
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
+if [[ "$TERM" != "linux" ]]; then
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;38;2;74m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[38;5;46m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32;2;12m'
   # this sets $LS_COLORS as well:
   eval "$("$dircolors_command" "$mescaline_home"/dircolors)"
   export ls_options
@@ -85,7 +94,7 @@ if [[ "$TERM" != "dumb" ]]; then
   alias less='less -R'
   alias diff='colordiff'
 fi
-
+fi
 # disable auto correction (sudo)
 alias sudo='nocorrect sudo'
 
