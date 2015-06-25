@@ -21,13 +21,13 @@ class Color:
     repo_dirty_fg = 15
     cmd_passed_bg = 236
     cmd_passed_fg = 242
-    cmd_failed_bg = 161
-    cmd_failed_fg = 15
+    cmd_failed_bg = 236
+    cmd_failed_fg = 161
     svn_changes_bg = 148
     svn_changes_fg = 22
     root_bg = 20
     root_fg = 248
-    user_bg = 240
+    user_bg = 24 
     user_fg = 248
     virtualenv_bg = 35
     virtualenv_fg = 22
@@ -257,7 +257,7 @@ def add_exitcode_indicator(mescaline, error):
     else:
         bg = Color.cmd_passed_bg
         fg = Color.cmd_passed_fg
-    mescaline.append(Segment(mescaline, '', fg, bg))
+    mescaline.append(Segment(mescaline, ' ' + str(error), fg, bg))
 
 # gets the last valid upper directory
 def get_valid_cwd():
@@ -301,6 +301,7 @@ if __name__ == '__main__':
     add_cwd_segment(m, cwd, 5)
     add_repo_segment(m, cwd)
 
+    # exit code should be specified as first argument to mescaline
     if int(sys.argv[1]) > 0:
         add_exitcode_indicator(m, sys.argv[1])
 

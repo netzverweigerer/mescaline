@@ -9,12 +9,23 @@
 mescaline_home="$HOME/git/mescaline/"
 
 _mescaline () {
-  export PROMPT="$($mescaline_home/mescaline $?)"
+
+if [[ ! "$TERM" == linux ]]; then;
+	if [[ "$TERM" != "dumb" ]]; then
+		export PROMPT="$($mescaline_home/mescaline $1)"
+	else
+		export PROMPT="[zsh] > "
+	fi
+else
+  export PROMPT="[zsh] > "
+fi
+
+print -Pn "\e]0;%n@%m: %~\a"
 }
 
 # call _mescaline function
 precmd () {
-	_mescaline
+	_mescaline "$?"
 }
 
 # osx specifics
@@ -44,15 +55,6 @@ else
 	export EDITOR='vi'
 fi
 
-# show man pages color
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;33m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
 # fix for ssh host completion from ~/.ssh/config (yes, this is ugly, sorry for this)
 [ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
 
@@ -61,20 +63,6 @@ setopt NO_HUP
 
 # set ls options
 ls_options="--color=auto --group-directories-first -F"
-
-# keychain
-if hash keychain; then
-	_s="$(which ssh)"
-	ssh () {
-		keychain >/dev/null 2>&1
-		h="$(uname -n)-sh"
-		[ -f $h ] && . $h
-		$_s "$@"
-	}
-fi
-
-# grep with color
-alias grep='grep --color=auto'
 
 # OS X specifics - allows us to use some GNU coreutils overrides.
 # we use variables here, as aliasing aliases may not work.
@@ -88,6 +76,14 @@ fi
 
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
+if [[ "$TERM" != "linux" ]]; then
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;38;2;74m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[38;5;46m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32;2;12m'
   # this sets $LS_COLORS as well:
   eval "$("$dircolors_command" "$mescaline_home"/dircolors)"
   export ls_options
@@ -98,7 +94,7 @@ if [[ "$TERM" != "dumb" ]]; then
   alias less='less -R'
   alias diff='colordiff'
 fi
-
+fi
 # disable auto correction (sudo)
 alias sudo='nocorrect sudo'
 
@@ -131,6 +127,7 @@ zstyle ':completion:*' list-colors ''
 # enable in-menu keybindings
 bindkey -M menuselect '^o' accept-and-infer-next-history
 zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:*:*:*:*' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=00;33=0=01'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
 
@@ -181,5 +178,20 @@ zle -N zle-keymap-select
 
 # use emacs line editing (command prompt input mode)
 bindkey -e
+
+compdef s='ssh'
+alias s='ssh'
+
+if [[ -n $SSH_AGENT_SETTINGS ]]; then
+	eval "$SSH_AGENT_SETTINGS"
+fi
+
+alias bspwm-edit-config="vi $HOME/git/bspwm/config"
+alias dzen2='dzen2 -fn verdana-7 -bg "#262626"'
+
+compdef g='git'
+alias g='git'
+
+
 
 
