@@ -301,6 +301,7 @@ if __name__ == '__main__':
     add_cwd_segment(m, cwd, 5)
     add_repo_segment(m, cwd)
 
+    # exit code should be specified as first argument to mescaline
     if int(sys.argv[1]) > 0:
         add_exitcode_indicator(m, sys.argv[1])
 

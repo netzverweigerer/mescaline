@@ -12,7 +12,7 @@ _mescaline () {
 
 if [[ ! "$TERM" == linux ]]; then;
 	if [[ "$TERM" != "dumb" ]]; then
-		export PROMPT="$($mescaline_home/mescaline $?)"
+		export PROMPT="$($mescaline_home/mescaline $1)"
 	else
 		export PROMPT="[zsh] > "
 	fi
@@ -25,7 +25,7 @@ print -Pn "\e]0;%n@%m: %~\a"
 
 # call _mescaline function
 precmd () {
-	_mescaline
+	_mescaline "$?"
 }
 
 # osx specifics
@@ -192,6 +192,6 @@ alias dzen2='dzen2 -fn verdana-7 -bg "#262626"'
 compdef g='git'
 alias g='git'
 
-$HOME/bin/space-invaders.sh
+
 
 
