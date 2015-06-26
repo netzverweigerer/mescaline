@@ -27,7 +27,7 @@ class Color:
     svn_changes_fg = 22
     root_bg = 20
     root_fg = 248
-    user_bg = 24 
+    user_bg = 58
     user_fg = 248
     virtualenv_bg = 35
     virtualenv_fg = 22
