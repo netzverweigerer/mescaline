@@ -15,9 +15,9 @@ class Color:
     path_fg = 250
     cwd_fg = 254
     separator_fg = 244
-    repo_clean_bg = 40
+    repo_clean_bg = 246
     repo_clean_fg = 0
-    repo_dirty_bg = 161
+    repo_dirty_bg = 124
     repo_dirty_fg = 15
     cmd_passed_bg = 236
     cmd_passed_fg = 242
@@ -196,6 +196,9 @@ def add_git_segment(mescaline, cwd):
     if has_pending_commits:
         bg = Color.repo_dirty_bg
         fg = Color.repo_dirty_fg
+    else:
+        bg = Color.repo_clean_bg
+        fg = Color.repo_clean_fg
 
     mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
     return True
