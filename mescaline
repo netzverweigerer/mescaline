@@ -67,7 +67,7 @@ def warn(msg):
 def add_cwd_segment(mescaline, cwd, maxdepth):
     home = os.getenv('HOME')
     cwd = os.getenv('PWD')
-    cwd_fg = "216"
+    cwd_fg = "202"
     if cwd.startswith(home):
       cwd = cwd.replace(home, '~', 1)
     mescaline.append(Segment(mescaline, '%s' % cwd, cwd_fg, Color.path_bg, cwd_fg))
