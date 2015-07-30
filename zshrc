@@ -14,7 +14,7 @@ if [[ ! "$TERM" == linux ]]; then;
 	if [[ "$TERM" != "dumb" ]]; then
 		export PROMPT="$($mescaline_home/mescaline $1)"
 	else
-		export PROMPT="[zsh] > "
+		export PROMPT="[zsh] penis > "
 	fi
 else
   export PROMPT="[zsh] > "
@@ -180,7 +180,6 @@ zle -N zle-keymap-select
 bindkey -e
 
 compdef s='ssh'
-alias s='ssh'
 
 if [[ -n $SSH_AGENT_SETTINGS ]]; then
 	eval "$SSH_AGENT_SETTINGS"
@@ -192,6 +191,29 @@ alias dzen2='dzen2 -fn verdana-7 -bg "#262626"'
 compdef g='git'
 alias g='git'
 
+alias pentadactyl=firefox
 
+alias apt-get='sudo aptitude -y'
+alias apt='sudo aptitude -y'
+alias apt-file='sudo apt-file'
+
+alias push='git push'
+alias clone='git clone'
+alias commit='git commit'
+alias remote='git remote'
+alias l='git log'
+alias log='git log'
+
+
+function ssh () {
+  args="$@"
+  $HOME/bin/_ssh "$@"
+}
+
+
+function scp () {
+  args="$@"
+  $HOME/bin/_scp "$@"
+}
 
 
