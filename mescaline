@@ -94,57 +94,10 @@ def warn(msg):
 def add_cwd_segment(mescaline, cwd, maxdepth):
     home = os.getenv('HOME')
     cwd = os.getenv('PWD')
-
-    if cwd.find(home) == 0:
-        cwd = cwd.replace(home, '~', 1)
-
-    if cwd[0] == '/':
-        cwd = cwd[1:]
-
-    names = cwd.split('/')
-    if len(names) > maxdepth:
-        names = names[:2] + ['⋯ '] + names[2 - maxdepth:]
-
-    for n in names[:-1]:
-        mescaline.append(Segment(mescaline, ' %s ' % n, Color.path_fg, Color.path_bg, mescaline.separator_thin, Color.separator_fg))
-
-    mescaline.append(Segment(mescaline, ' %s ' % names[-1], Color.cwd_fg, Color.path_bg))
-
-def get_hg_status():
-    has_modified_files = False
-    has_untracked_files = False
-    has_missing_files = False
-    output = subprocess.Popen(['hg', 'status'], stdout=subprocess.PIPE).communicate()[0]
-    for line in output.split('\n'):
-        if line == '':
-            continue
-        elif line[0] == '?':
-            has_untracked_files = True
-        elif line[0] == '!':
-            has_missing_files = True
-        else:
-            has_modified_files = True
-    return has_modified_files, has_untracked_files, has_missing_files
-
-def add_hg_segment(mescaline, cwd):
-    branch = os.popen('hg branch 2> /dev/null').read().rstrip()
-    if len(branch) == 0:
-        return False
-    bg = Color.repo_clean_bg
-    fg = Color.repo_clean_fg
-    has_modified_files, has_untracked_files, has_missing_files = get_hg_status()
-    if has_modified_files or has_untracked_files or has_missing_files:
-        bg = Color.repo_dirty_bg
-        fg = Color.repo_dirty_fg
-        extra = ''
-        if has_untracked_files:
-            extra += '+'
-        if has_missing_files:
-            extra += '!'
-        branch += (' ' + extra if extra != '' else '')
-    mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
-    return True
-
+    cwd_fg = "202"
+    if cwd.startswith(home):
+      cwd = cwd.replace(home, '~', 1)
+    mescaline.append(Segment(mescaline, '%s' % cwd, cwd_fg, Color.path_bg, cwd_fg))
 def get_git_status():
     has_pending_commits = True
     has_untracked_files = False
@@ -221,7 +174,7 @@ def add_svn_segment(mescaline, cwd):
 
 # adds repo segments for git/svn/hg
 def add_repo_segment(mescaline, cwd):
-    for add_repo_segment in [add_git_segment, add_svn_segment, add_hg_segment]:
+    for add_repo_segment in [add_git_segment]:
         try:
             if add_repo_segment(m, cwd):
                 return
