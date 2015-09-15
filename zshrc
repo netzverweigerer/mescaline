@@ -197,6 +197,11 @@ alias getporn="$HOME/git/getporn.github.io/getporn"
 # FIXME
 zstyle ':completion:*:default' list-colors $LS_COLORS
 
+export HOMEBREW_NO_EMOJI=1
+
+
+
+  fpath=(/usr/local/share/zsh-completions $fpath)
 
 
 
