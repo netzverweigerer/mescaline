@@ -121,37 +121,48 @@ zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm 
 # disable named-directories autocompletion
 zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 cdpath=(.)
+
 # allow extended globbing
 setopt extendedglob
+
 # don't complete first match (wildcard match)
 zstyle '*' single-ignored show
+
 # enable completion system (-i: disable check for insecure
 # files/directories)
 autoload -U compinit && compinit -i
+
 # use expand-or-complete-with-dots
 zle -N expand-or-complete-with-dots
 expand-or-complete-with-dots() {
-    echo -n "\e[36mᕁ\e[0m"
-    zle expand-or-complete
-    zle redisplay
+echo -n "\e[36mᕁ\e[0m"
+zle expand-or-complete
+zle redisplay
 }
 bindkey "^I" expand-or-complete-with-dots
 bindkey 'tab' expand-or-complete-with-dots
+
 # load "select-word-style"
 autoload -Uz select-word-style
+
 # it's magic!
 select-word-style bash
+
 # enable backward-kill-word-match
 zle -N backward-kill-word-match
+
 # history options 
 export HISTSIZE=2000 
 export HISTFILE="$HOME/.history"
 export SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
+
 # automatically cd to dir without "cd" needed
 setopt autocd
+
 # this let's us select keymaps (command prompt input mode)
 zle -N zle-keymap-select
+
 # use emacs line editing (command prompt input mode)
 bindkey -e
 
@@ -191,18 +202,17 @@ if [[ -f "$HOME/.ssh-agent.out" ]]; then
 	grep -v '^echo' $HOME/.ssh-agent.out | while read line; do eval "$line"; done
 fi
 
-# does what the name says.
-alias getporn="$HOME/git/getporn.github.io/getporn"
-
-# FIXME
-zstyle ':completion:*:default' list-colors $LS_COLORS
+# ?
+# zstyle ':completion:*:default' list-colors $LS_COLORS
 
 export HOMEBREW_NO_EMOJI=1
 
+fpath=(/usr/local/share/zsh-completions $fpath)
 
+export PATH="$PATH:/usr/local/bin:/usr/local/sbin"
 
-  fpath=(/usr/local/share/zsh-completions $fpath)
-
+# add specific repositories from $HOME/git/ to $PATH
+repos=(isotwist m2m peervpn)
 
 
 
