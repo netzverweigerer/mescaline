@@ -23,8 +23,6 @@ class Color:
     cmd_passed_fg = 242
     cmd_failed_bg = 236
     cmd_failed_fg = 243
-    svn_changes_bg = 148
-    svn_changes_fg = 22
     root_bg = 234
     root_fg = 248
     user_bg = 8
@@ -156,23 +154,7 @@ def add_git_segment(mescaline, cwd):
     mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
     return True
 
-def add_svn_segment(mescaline, cwd):
-    if not os.path.exists(os.path.join(cwd, '.svn')):
-        return
-    try:
-        p1 = subprocess.Popen(['svn', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p2 = subprocess.Popen(['grep', '-c', '^[ACDIMRX\\!\\~]'], stdin=p1.stdout, stdout=subprocess.PIPE)
-        output = p2.communicate()[0].strip()
-        if len(output) > 0 and int(output) > 0:
-            changes = output.strip()
-            mescaline.append(Segment(mescaline, ' %s ' % changes, Color.svn_changes_fg, Color.svn_changes_bg))
-    except OSError:
-        return False
-    except subprocess.CalledProcessError:
-        return False
-    return True
-
-# adds repo segments for git/svn/hg
+# adds repo segments for git
 def add_repo_segment(mescaline, cwd):
     for add_repo_segment in [add_git_segment]:
         try:
