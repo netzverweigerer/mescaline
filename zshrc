@@ -204,16 +204,25 @@ alias remote='git remote'
 alias l='git log'
 alias log='git log'
 
-
+ssh_real="$(which ssh)"
 function ssh () {
-  args="$@"
+args="$@"
+if [[ -e $HOME/bin/_ssh ]]; then
   $HOME/bin/_ssh "$@"
+else
+	$ssh_real -v "$@"
+fi
 }
 
-
+scp_real="$(which scp)"
 function scp () {
-  args="$@"
-  $HOME/bin/_scp "$@"
+args="$@"
+if [[ -e $HOME/bin/_scp ]]; then
+  $scp_real scp "$@"
+else
+	/usr/bin/scp -v "$@"
+fi
 }
+
 
 
