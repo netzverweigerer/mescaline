@@ -7,32 +7,14 @@
 # set mescaline installation location
 mescaline_home="$HOME/git/mescaline/"
 
-
-
-
 _mescaline () {
   export PROMPT="$($mescaline_home/mescaline $?)"
 }
-
-
-
-
-
-
 
 # call _mescaline function
 precmd () {
 	_mescaline
 }
-
-
-
-
-
-
-
-
-
 
 # osx specifics
 if [[ "$(uname)" == "Darwin" ]]; then
@@ -40,22 +22,27 @@ if [[ "$(uname)" == "Darwin" ]]; then
 else
   osx=0
 fi
+
 # force $TERM on rxvt
 if [[ "$COLORTERM" == "rxvt-xpm" ]]; then
   export TERM="rxvt-unicode-256color"
 fi
+
 # force $TERM on xfce4-terminal
 if [[ "$COLORTERM" == "xfce4-terminal" ]]; then
   export TERM="xterm-256color"
 fi
+
 # set $PATH
 export PATH="$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+
 # set standard editor via $EDITOR
 if hash vim 2>&1 >/dev/null; then
   export EDITOR='vim'
 else
 	export EDITOR='vi'
 fi
+
 # show man pages color
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;33m'
@@ -64,23 +51,22 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
+
 # fix for ssh host completion from ~/.ssh/config (yes, this is ugly, sorry for this)
 # [ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
+#
 # needed to keep backgrounded jobs running
 setopt NO_HUP
+
 # set ls options
 ls_options="--color=auto --group-directories-first -F"
+
 # grep with color
 alias grep='grep --color=auto'
-# OS X specifics - allows us to use some GNU coreutils overrides.
-# we use variables here, as aliasing aliases may not work.
-if [[ "$osx" -gt 0 ]]; then
-  dircolors_command="gdircolors"
-  ls_command="gls"
-else
-  dircolors_command="dircolors"
-  ls_command="ls"
-fi
+
+dircolors_command="gdircolors"
+ls_command="gls"
+
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
   # this sets $LS_COLORS as well:
@@ -93,6 +79,7 @@ if [[ "$TERM" != "dumb" ]]; then
   alias less='less -R'
   alias diff='colordiff'
 fi
+
 # disable auto correction (sudo)
 alias sudo='nocorrect sudo'
 # disable auto correction (global)
@@ -209,10 +196,15 @@ export HOMEBREW_NO_EMOJI=1
 
 fpath=(/usr/local/share/zsh-completions $fpath)
 
-export PATH="$PATH:/usr/local/bin:/usr/local/sbin"
+export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/Users/armin/Library/Python/2.7/bin/"
 
 # add specific repositories from $HOME/git/ to $PATH
 repos=(isotwist m2m peervpn)
+
+alias ipython="$HOME/Library/Python/2.7/bin/ipython"
+alias retina="$HOME/git/retina/retina"
+alias pkg=brew
+alias pstree='pstree -g 2'
 
 
 
