@@ -15,7 +15,7 @@ class Color:
     path_fg = 250
     cwd_fg = 254
     separator_fg = 244
-    repo_clean_bg = 246
+    repo_clean_bg = 240
     repo_clean_fg = 0
     repo_dirty_bg = 124
     repo_dirty_fg = 15
