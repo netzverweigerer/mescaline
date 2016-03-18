@@ -12,7 +12,7 @@ _mescaline () {
 
 if [[ ! "$TERM" == linux ]]; then;
 	if [[ "$TERM" != "dumb" ]]; then
-		export PROMPT="$($mescaline_home/mescaline $1)"
+		export PROMPT="$($mescaline_home/mescaline $1 2>/dev/null)"
 	else
 		export PROMPT="[zsh] penis > "
 	fi
@@ -223,6 +223,10 @@ else
 	/usr/bin/scp -v "$@"
 fi
 }
+
+if [[ "$TERM" == screen ]]; then
+export TERM=screen-256color
+fi
 
 
 
