@@ -27,8 +27,8 @@ class Color:
     svn_changes_fg = 22
     root_bg = 234
     root_fg = 248
-    user_bg = 8
-    user_fg = 248
+    user_bg = 0
+    user_fg = 250
     virtualenv_bg = 35
     virtualenv_fg = 22
 
@@ -201,7 +201,7 @@ def add_git_segment(mescaline, cwd):
         bg = Color.repo_clean_bg
         fg = Color.repo_clean_fg
 
-    mescaline.append(Segment(mescaline, ' %s ' % branch, fg, bg))
+    mescaline.append(Segment(mescaline, ' %s' % branch, fg, bg))
     return True
 
 def add_svn_segment(mescaline, cwd):

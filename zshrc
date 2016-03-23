@@ -229,4 +229,5 @@ export TERM=screen-256color
 fi
 
 
+export MPD_HOST=192.168.1.200
 
