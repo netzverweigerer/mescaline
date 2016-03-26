@@ -1,19 +1,31 @@
 # mescaline for zsh - based on powerline / ezzsh, but this version is
 # entirely re-written from scratch.
-# Written by Arminius <armin@mutt.email>
+# Written by Arminius <armin@arminius.org>
+#
 # Released under the terms of the GNU General Public License,
 # Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
 # set mescaline installation location
-mescaline_home="$HOME/git/mescaline/"
+mescaline_home="$HOME/.mescaline/"
 
 _mescaline () {
-  export PROMPT="$($mescaline_home/mescaline $?)"
+
+if [[ ! "$TERM" == linux ]]; then;
+	if [[ "$TERM" != "dumb" ]]; then
+		export PROMPT="$($mescaline_home/mescaline $1 2>/dev/null)"
+	else
+		export PROMPT="[zsh] $ "
+	fi
+else
+  export PROMPT="[zsh] > "
+fi
+
+print -Pn "\e]0;%n@%m: %~\a"
 }
 
 # call _mescaline function
 precmd () {
-	_mescaline
+	_mescaline "$?"
 }
 
 # osx specifics
@@ -34,41 +46,44 @@ if [[ "$COLORTERM" == "xfce4-terminal" ]]; then
 fi
 
 # set $PATH
-export PATH="$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH:"
 
 # set standard editor via $EDITOR
-if hash vim 2>&1 >/dev/null; then
+if hash vim; then
   export EDITOR='vim'
 else
 	export EDITOR='vi'
 fi
 
-# show man pages color
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;33m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
 # fix for ssh host completion from ~/.ssh/config (yes, this is ugly, sorry for this)
-# [ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
-#
+[ -f ~/.ssh/config ] && : ${(A)ssh_config_hosts:=${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*\**}:#*\?*}}
+
 # needed to keep backgrounded jobs running
 setopt NO_HUP
 
 # set ls options
 ls_options="--color=auto --group-directories-first -F"
 
-# grep with color
-alias grep='grep --color=auto'
-
-dircolors_command="gdircolors"
-ls_command="gls"
+# OS X specifics - allows us to use some GNU coreutils overrides.
+# we use variables here, as aliasing aliases may not work.
+if [[ "$osx" -gt 0 ]]; then
+  dircolors_command="gdircolors"
+  ls_command="gls"
+else
+  dircolors_command="dircolors"
+  ls_command="ls"
+fi
 
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
+if [[ "$TERM" != "linux" ]]; then
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;38;2;74m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[38;5;46m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32;2;12m'
   # this sets $LS_COLORS as well:
   eval "$("$dircolors_command" "$mescaline_home"/dircolors)"
   export ls_options
@@ -79,29 +94,40 @@ if [[ "$TERM" != "dumb" ]]; then
   alias less='less -R'
   alias diff='colordiff'
 fi
-
+fi
 # disable auto correction (sudo)
 alias sudo='nocorrect sudo'
+
 # disable auto correction (global)
 unsetopt correct{,all} 
+
 # don't select first tab menu entry
 unsetopt menu_complete
+
 # disable flowcontrol
 unsetopt flowcontrol
+
 # enable tab completion menu
 setopt auto_menu
+
 # enable in-word completion
 setopt complete_in_word
 setopt always_to_end
+
 # word characters
+# WORDCHARS='-'
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
 # load complist mod
 zmodload -i zsh/complist
+
 # completion list color definitions
 zstyle ':completion:*' list-colors ''
+
 # enable in-menu keybindings
 bindkey -M menuselect '^o' accept-and-infer-next-history
 zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:*:*:*:*' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=00;33=0=01'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 zstyle ':completion:*:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
 
@@ -122,12 +148,29 @@ autoload -U compinit && compinit -i
 # use expand-or-complete-with-dots
 zle -N expand-or-complete-with-dots
 expand-or-complete-with-dots() {
-echo -n "\e[36mᕁ\e[0m"
-zle expand-or-complete
-zle redisplay
+    echo -n "\e[36mᕁ\e[0m"
+    zle expand-or-complete
+    zle redisplay
 }
+
+
+
+
+
+
+
+
+
+#DISABLED
+# bindkey 'tab' expand-or-complete-with-dots
+# bindkey "^I" expand-cmd-path 
+# bindkey "^I" expand-cmd-path 
+#
 bindkey "^I" expand-or-complete-with-dots
-bindkey 'tab' expand-or-complete-with-dots
+
+
+
+
 
 # load "select-word-style"
 autoload -Uz select-word-style
@@ -152,59 +195,5 @@ zle -N zle-keymap-select
 
 # use emacs line editing (command prompt input mode)
 bindkey -e
-
-# dirty hack to enable ssh host completions
-h=()
-if [[ -r ~/.ssh/config ]]; then
-  h=($h ${${${(@M)${(f)"$(cat ~/.ssh/config)"}:#host *}#host }:#*[*?]*})
-fi
-if [[ -r ~/.ssh/known_hosts ]]; then
-  h=($h ${${${(f)"$(cat ~/.ssh/known_hosts{,2} || true)"}%%\ *}%%,*}) 2>/dev/null
-fi
-if [[ $#h -gt 0 ]]; then
-  zstyle ':completion:*:ssh:*' hosts $h
-  zstyle ':completion:*:slogin:*' hosts $h
-fi
-
-# simple ssh wrapper
-_ssh="$(which ssh)";ssh(){tput setaf 241; $_ssh -v "$@"; tput setaf 248}
-
-# debian/apt aliases
-alias apt-get="tput setaf 106; sudo apt-get -y"
-alias aptitude="sudo aptitude -y"
-alias apt-cache="sudo apt-cache"
-alias apt-file="sudo apt-file"
-alias install='sudo apt-get -y install'
-
-# pentadactyl -> firefox alias 
-alias pentadactyl=firefox
-
-# gpg aliases
-alias gpg="gpg --keyserver wwwkeys.eu.pgp.net"
-
-# sudo: retain customized user environment
-alias sudo="sudo -E"
-
-if [[ -f "$HOME/.ssh-agent.out" ]]; then
-	grep -v '^echo' $HOME/.ssh-agent.out | while read line; do eval "$line"; done
-fi
-
-# ?
-# zstyle ':completion:*:default' list-colors $LS_COLORS
-
-export HOMEBREW_NO_EMOJI=1
-
-fpath=(/usr/local/share/zsh-completions $fpath)
-
-export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/Users/armin/Library/Python/2.7/bin/"
-
-# add specific repositories from $HOME/git/ to $PATH
-repos=(isotwist m2m peervpn)
-
-alias ipython="$HOME/Library/Python/2.7/bin/ipython"
-alias retina="$HOME/git/retina/retina"
-alias pkg=brew
-alias pstree='pstree -g 2'
-
 
 
