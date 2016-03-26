@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 import os
 import subprocess
@@ -17,7 +18,7 @@ class Color:
     separator_fg = 244
     repo_clean_bg = 242
     repo_clean_fg = 0
-    repo_dirty_bg = 124
+    repo_dirty_bg = 88
     repo_dirty_fg = 15
     cmd_passed_bg = 236
     cmd_passed_fg = 242
@@ -87,9 +88,11 @@ class Segment:
 
 # prints a warning message
 def warn(msg):
-    print('[mescaline] ', msg)
+    print('[mescaline] Warning: ', msg)
 
-
+# prints a warning message
+def error(msg):
+    print('[mescaline] Error: ', msg)
 
 # adds a current working directory segment
 def add_cwd_segment(mescaline, cwd, maxdepth):
@@ -189,7 +192,7 @@ def add_git_segment(mescaline, cwd):
         branch += origin_position
 
     if has_untracked_files:
-        branch += ' +'
+        branch += ' *'
 
     bg = Color.repo_clean_bg
     fg = Color.repo_clean_fg
@@ -201,7 +204,7 @@ def add_git_segment(mescaline, cwd):
         bg = Color.repo_clean_bg
         fg = Color.repo_clean_fg
 
-    mescaline.append(Segment(mescaline, ' %s' % branch, fg, bg))
+    mescaline.append(Segment(mescaline, '  %s' % branch, fg, bg))
     return True
 
 def add_svn_segment(mescaline, cwd):

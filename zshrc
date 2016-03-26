@@ -14,7 +14,7 @@ if [[ ! "$TERM" == linux ]]; then;
 	if [[ "$TERM" != "dumb" ]]; then
 		export PROMPT="$($mescaline_home/mescaline $1 2>/dev/null)"
 	else
-		export PROMPT="[zsh] penis > "
+		export PROMPT="[zsh] $ "
 	fi
 else
   export PROMPT="[zsh] > "
@@ -152,8 +152,25 @@ expand-or-complete-with-dots() {
     zle expand-or-complete
     zle redisplay
 }
+
+
+
+
+
+
+
+
+
+#DISABLED
+# bindkey 'tab' expand-or-complete-with-dots
+# bindkey "^I" expand-cmd-path 
+# bindkey "^I" expand-cmd-path 
+#
 bindkey "^I" expand-or-complete-with-dots
-bindkey 'tab' expand-or-complete-with-dots
+
+
+
+
 
 # load "select-word-style"
 autoload -Uz select-word-style
