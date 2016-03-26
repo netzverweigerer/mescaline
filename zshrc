@@ -6,7 +6,7 @@
 # Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
 # set mescaline installation location
-mescaline_home="$HOME/git/mescaline/"
+mescaline_home="$HOME/.mescaline/"
 
 _mescaline () {
 
