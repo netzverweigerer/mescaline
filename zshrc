@@ -6,7 +6,7 @@
 # Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
 # set mescaline installation location
-mescaline_home="$HOME/.mescaline/"
+mescaline_home="$HOME/git/mescaline"
 
 _mescaline () {
 
@@ -196,4 +196,12 @@ zle -N zle-keymap-select
 # use emacs line editing (command prompt input mode)
 bindkey -e
 
+# source environment setup file
+if [ -f $HOME/.env ]; then
+  source $HOME/.env
+fi
+
+# fix home/end keys
+bindkey '\e[1~' beginning-of-line
+bindkey '\e[4~' end-of-line
 
