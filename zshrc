@@ -148,7 +148,7 @@ autoload -U compinit && compinit -i
 # use expand-or-complete-with-dots
 zle -N expand-or-complete-with-dots
 expand-or-complete-with-dots() {
-    echo -n "\e[36mᕁ\e[0m"
+    echo -n "\e[36m⌛\e[0m"
     zle expand-or-complete
     zle redisplay
 }
