@@ -21,11 +21,8 @@ Current features
 *full* git support! know what you're doing without having to check!
 
 What does it look like?
-Screenshots are believing, so here we go:
 
-[mescaline](netzverweigerer.github.com/mescaline/img/mescaline.png)
-
-
+![Screenshot](/img/mescaline.png)
 
 
 
