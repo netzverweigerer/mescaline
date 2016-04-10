@@ -40,7 +40,7 @@ fileexists "$HOME/.zshrc"
 mkdir -p "$HOME/.mescaline"
 cp -R ./ "$HOME/.mescaline"
 cd
-ln -s .mescaline/zshrc .zshrc || msg 'Symbolic link ~/.zshrc exists. Delete this manually.'
+ln -s .mescaline/zshrc .zshrc || msg 'Symbolic link ~/.zshrc exists, I will not touch this for you.'
 
 msg "setup complete."
 
