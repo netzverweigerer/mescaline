@@ -192,18 +192,10 @@ fi
 # ?
 # zstyle ':completion:*:default' list-colors $LS_COLORS
 
-export HOMEBREW_NO_EMOJI=1
-
 fpath=(/usr/local/share/zsh-completions $fpath)
 
 export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/Users/armin/Library/Python/2.7/bin/"
 
-# add specific repositories from $HOME/git/ to $PATH
-repos=(isotwist m2m peervpn)
-
-alias ipython="$HOME/Library/Python/2.7/bin/ipython"
-alias retina="$HOME/git/retina/retina"
-alias pkg=brew
 alias pstree='pstree -g 2'
 
 
