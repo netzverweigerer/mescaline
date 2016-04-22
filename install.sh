@@ -7,12 +7,10 @@
 # This file is part of mescaline for zsh.
 #
 
-# exit on errors
-set -e
-
 # parameter expansion to extract the scripts home directory
 home="${0%/*}"
-# cd to $home
+
+# cd to parent location folder
 cd "$home"
 
 # print a message
@@ -21,12 +19,15 @@ msg () {
   printf "$@ \n"
 }
 
+bailout () {
+  printf "ERROR: $@\n"
+  exit 255
+}
+
 # file/directory exists error message
 fileexists () {
-  file="$@"
-  if [ -e "$file" ]; then
-    msg "File or directory exists: "
-    msg "${file}"
+  if [ -e "$1" ]; then
+    msg "File or directory exists: $1"
     msg "I'm not going to overwrite it, so you have to resolve this manually."
     msg "Exiting gracefully. Goodbye."
     exit 1
@@ -40,7 +41,8 @@ fileexists "$HOME/.zshrc"
 mkdir -p "$HOME/.mescaline"
 cp -R ./ "$HOME/.mescaline"
 cd
-ln -s .mescaline/zshrc .zshrc || msg 'Symbolic link ~/.zshrc exists, I will not touch this for you.'
+
+ln -s .mescaline/zshrc .zshrc || bailout 'Symbolic link ~/.zshrc exists, I will not touch this for you.'
 
 msg "setup complete."
 
