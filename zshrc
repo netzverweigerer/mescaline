@@ -64,15 +64,10 @@ setopt NO_HUP
 # set ls options
 ls_options="--color=auto --group-directories-first -F"
 
-# OS X specifics - allows us to use some GNU coreutils overrides.
-# we use variables here, as aliasing aliases may not work.
-if [[ "$osx" -gt 0 ]]; then
-  dircolors_command="gdircolors"
-  ls_command="gls"
-else
-  dircolors_command="dircolors"
-  ls_command="ls"
-fi
+# ls_options="-F"
+
+dircolors_command="gdircolors"
+ls_command="gls"
 
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
@@ -208,5 +203,16 @@ bindkey '\e[4~' end-of-line
 # share history among sessions?
 setopt share_history
 
+
+. /etc/profile
+
+. /usr/home/armin/git/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+alias t='tmux detach; tmux attach'
+
+export PATH="$PATH:/usr/local/libexec/git-core"
 
 
