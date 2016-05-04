@@ -207,3 +207,12 @@ setopt share_history
 . /etc/profile
 
 . /usr/home/armin/git/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+alias t='tmux detach; tmux attach'
+
+export PATH="$PATH:/usr/local/libexec/git-core"
+
+
