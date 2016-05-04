@@ -18,7 +18,7 @@ This is a *very* lightweight way to get those cool fancy powerline'ish prompts i
 Current features
 ================
 
-*full* git support! know what you're doing without having to check!
+*full* git support! That means you will get the current branch name you're on within the prompt, including an indicator for un-tracked files and an indicator telling you there are commits that you didn't push or pull, yet.
 
 What does it look like?
 

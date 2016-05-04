@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+#
+# This file is part of mescaline, a minimalistic Python 3+ ZSH prompt builder
+# with full powerline support (you'll need powerline-compatible fonts, see
+# https://github.com/powerline/fonts
+#
+# Copyright (c) 2016 Armin Jenewein <a@m2m.pm>, released under the terms of the
+# GNU General Public License (Version 3+).
+#
+# See https://github.com/netzverweigerer/mescaline for details.
+#
 
 import os
 import subprocess
@@ -19,16 +29,16 @@ class Color:
     repo_clean_bg = 246
     repo_clean_fg = 0
     repo_dirty_bg = 88
-    repo_dirty_fg = 15
+    repo_dirty_fg = 251
     cmd_passed_bg = 236
     cmd_passed_fg = 242
     cmd_failed_bg = 236
-    cmd_failed_fg = 243
+    cmd_failed_fg = 203
     svn_changes_bg = 148
     svn_changes_fg = 22
     root_bg = 234
     root_fg = 248
-    user_bg = 0
+    user_bg = 235
     user_fg = 250
     virtualenv_bg = 35
     virtualenv_fg = 22

@@ -5,8 +5,8 @@
 # Released under the terms of the GNU General Public License,
 # Version 3, © 2007-2015 Free Software Foundation, Inc. -- http://fsf.org/
 
-# set mescaline installation location
-mescaline_home="$HOME/git/mescaline"
+# set mescaline installation location (no need to suffix with /)
+mescaline_home="$HOME/.mescaline"
 
 _mescaline () {
 
