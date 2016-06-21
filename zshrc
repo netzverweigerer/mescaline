@@ -8,6 +8,9 @@
 # set mescaline installation location (no need to suffix with /)
 mescaline_home="$HOME/.mescaline"
 
+# set path to zsh-syntax-highlighting file
+zsh_syntax_highlighting_file="$HOME/git/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
 _mescaline () {
 
 if [[ ! "$TERM" == linux ]]; then;
@@ -79,17 +82,23 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[38;5;46m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32;2;12m'
-  # this sets $LS_COLORS as well:
+
+# NOTE: this sets $LS_COLORS as well:
+if hash "$dircolors_command" >/dev/null 2>&1; then
   eval "$("$dircolors_command" "$mescaline_home"/dircolors)"
-  export ls_options
-  export LS_COLORS
-  alias ls="$ls_command $ls_options"
-  # colored grep / less
-  alias grep="grep --color='auto'"
-  alias less='less -R'
-  alias diff='colordiff'
+fi
+
+export ls_options
+export LS_COLORS
+
+alias ls="$ls_command $ls_options"
+# colored grep / less
+alias grep="grep --color='auto'"
+alias less='less -R'
+alias diff='colordiff'
 fi
 fi
+
 # disable auto correction (sudo)
 alias sudo='nocorrect sudo'
 
@@ -206,7 +215,6 @@ setopt share_history
 
 . /etc/profile
 
-. /usr/home/armin/git/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -214,5 +222,9 @@ export LANG=en_US.UTF-8
 alias t='tmux detach; tmux attach'
 
 export PATH="$PATH:/usr/local/libexec/git-core"
+
+if [[ -f "$zsh_syntax_highlighting_file" ]]; then
+  . "$zsh_syntax_highlighting_file"
+fi
 
 
