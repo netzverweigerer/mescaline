@@ -200,11 +200,6 @@ zle -N zle-keymap-select
 # use emacs line editing (command prompt input mode)
 bindkey -e
 
-# source environment setup file
-if [ -f $HOME/.env ]; then
-  source $HOME/.env
-fi
-
 # fix home/end keys
 bindkey '\e[1~' beginning-of-line
 bindkey '\e[4~' end-of-line
@@ -225,6 +220,16 @@ export PATH="$PATH:/usr/local/libexec/git-core"
 
 if [[ -f "$zsh_syntax_highlighting_file" ]]; then
   . "$zsh_syntax_highlighting_file"
+fi
+
+# custom aliases
+if [[ -f "$HOME/.zsh_aliases" ]]; then
+  . $HOME/.zsh_aliases
+fi
+
+# source environment setup file
+if [ -f $HOME/.env ]; then
+  source $HOME/.env
 fi
 
 
