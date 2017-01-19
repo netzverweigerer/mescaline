@@ -69,8 +69,8 @@ ls_options="--color=auto --group-directories-first -F"
 
 # ls_options="-F"
 
-dircolors_command="gdircolors"
-ls_command="gls"
+dircolors_command="dircolors"
+ls_command="ls"
 
 # enable ls colorization: 
 if [[ "$TERM" != "dumb" ]]; then
