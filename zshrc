@@ -214,8 +214,6 @@ setopt share_history
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-alias t='tmux detach; tmux attach'
-
 export PATH="$PATH:/usr/local/libexec/git-core"
 
 if [[ -f "$zsh_syntax_highlighting_file" ]]; then
